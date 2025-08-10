@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <form class="converter-container">
+        <h1>Unit Converter</h1>
+        
+        <div class="conversion-types">
+            <label for="conversion-type">Conversion Type:</label>
+            <select id="conversion-type">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <option value="temperature">Temperature</option>
+            </select>
+        </div>
+
+        <h4>Enter the Value to Convert</h4>
+        <input type="number" id="input-value" step="any">
+        
+        <h4>Unit to Convert From</h4>
+        <select id="from-unit">
+        </select>
+        
+        <h4>Unit to Convert To</h4>
+        <select id="to-unit">
+        </select>
+        
+        <br><br>
+        <button type="button" id="convert-button">Convert</button>
+        
+        <p id="result"></p>
+    </form>
+    <script>
+        // Get DOM elements
+        const conversionTypeSelect = document.getElementById('conversion-type');
+        const fromUnitSelect = document.getElementById('from-unit');
+        const toUnitSelect = document.getElementById('to-unit');
+        const inputValue = document.getElementById('input-value');
+        const convertButton = document.getElementById('convert-button');
+        const resultDiv = document.getElementById('result');
+
+        // Names for selection options in populateUnitSelects
+        const unitsData = {
+            length: ["meters", "kilometers", "centimeters", "feet", "inches", "miles", "yards"],
+            weight: ["milligrams", "grams", "kilograms", "ounces", "pounds"],
+            temperature: ["Celsius", "Fahrenheit", "Kelvin"]
+        };
+
+        // Function to populate unit selects based on conversion type
+        function populateUnitSelects(selectedType) {
+            const units = unitsData[selectedType];
+            // Clear existing options
+            fromUnitSelect.innerHTML = '';
+            toUnitSelect.innerHTML = '';
+            
+            // Add new options
+            units.forEach(unit => {
+                const option = document.createElement('option');
+                option.value = unit;
+                option.textContent = unit;
+                fromUnitSelect.appendChild(option.cloneNode(true));
+                toUnitSelect.appendChild(option);
+            });
+        }
+        
+        convertButton.addEventListener("click", async () =>{
+            console.log(fromUnitSelect.value);
+            console.log(toUnitSelect.value);
+            const conversionData = {
+                type: conversionTypeSelect.value,
+                from: fromUnitSelect.value,
+                to: toUnitSelect.value,
+                value: inputValue.value,
+                //timestamp: new Date().toISOString()
+            };
+
+            try {
+                // Insert server here
+                const response = await fetch('http://localhost:3000/api/units', {
+                    method : 'POST',
+                    headers : {
+                        'Content-Type' : 'application/json',
+                    },
+                    body : JSON.stringify(conversionData)
+                })
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+        
+                const result = await response.json();
+                console.log('Conversion Request logged:', result);
+
+                //TODO Display The Converted Value
+                resultDiv.textContent = "Converted Value: " + result.convertedValue;
+            } catch (error) {
+                console.error('Error logging conversion:', error);
+            }
+        })
+
+        conversionTypeSelect.addEventListener("change", (event) => {
+            populateUnitSelects(event.target.value);
+        })
+
+        // Main
+        populateUnitSelects(conversionTypeSelect.value);
+    </script>   
+</body>
+</html>
