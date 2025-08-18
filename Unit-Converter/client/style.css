@@ -1,0 +1,67 @@
+body {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    flex-direction: column;
+    
+    margin: 0;
+    padding: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+    color: #f0f0f0; 
+    background-color: #0F1016;
+    min-height: 100vh; 
+    width: 100vw;
+    box-sizing: border-box;
+}
+
+.converter-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+
+    border: 3px solid #3A3B45; 
+    background-color: #1E1F29; 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+
+    width: min(350px, 100%);
+    min-height: 350px;
+    padding: 25px; /* Slightly more padding */
+    box-sizing: border-box;
+    border-radius: 12px; /* Added subtle rounding */
+}
+
+#convert-button {
+    align-self: center;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    background-color: #6366F1; 
+    color: white;
+    border-radius: 8px; 
+    font-size: large;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#convert-button:hover {
+    background-color: #4F46E5; /* Lighter Color transition */
+}
+
+#conversion-type, #from-unit, #to-unit {
+    box-sizing: border-box;
+    background-color: #2D2D3A; /* Darker than container for contrast */
+    border: 2px solid #3A3B45; 
+    color: white;
+    border-radius: 6px; 
+    padding: 10px 15px; 
+    width: 100%;
+}
+
+#conversion-type:focus, #from-unit:focus, #to-unit:focus {
+    outline: none; /* Lighter Color transition */
+    border-color: #6366F1; 
+}

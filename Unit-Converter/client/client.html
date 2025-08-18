@@ -30,7 +30,7 @@
         <select id="to-unit">
         </select>
         
-        <br><br>
+        
         <button type="button" id="convert-button">Convert</button>
         
         <p id="result"></p>
@@ -69,6 +69,11 @@
         }
         
         convertButton.addEventListener("click", async () =>{
+            if (inputValue.value <= 0){
+                resultDiv.textContent = "Please Enter a Positive Value";
+                return
+            }
+
             console.log(fromUnitSelect.value);
             console.log(toUnitSelect.value);
             const conversionData = {
@@ -76,7 +81,6 @@
                 from: fromUnitSelect.value,
                 to: toUnitSelect.value,
                 value: inputValue.value,
-                //timestamp: new Date().toISOString()
             };
 
             try {
@@ -94,7 +98,6 @@
                 const result = await response.json();
                 console.log('Conversion Request logged:', result);
 
-                //TODO Display The Converted Value
                 resultDiv.textContent = "Converted Value: " + result.convertedValue;
             } catch (error) {
                 console.error('Error logging conversion:', error);
