@@ -77,16 +77,5 @@ The script consists of two main functions:
 **`printGitHubRepos(events)`** – Formats and displays the activity data  
 - Takes an array of event objects  
 - Prints formatted output to console  
-- Handles empty activity lists  
-
-## Requirements
-
-- Node.js (version 16 or higher recommended)
-- Internet connection to access GitHub API
-
-## Limitations
-
-- Currently only displays basic event information
-- No pagination support (only shows most recent events)
-- Rate limited by GitHub API (60 requests per hour for unauthenticated requests)
+- Handles empty activity lists
 
