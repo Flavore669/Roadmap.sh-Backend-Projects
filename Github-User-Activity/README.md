@@ -15,7 +15,7 @@ This CLI tool allows you to fetch the recent activity of any GitHub user and dis
 
 ## Installation
 
-1. Ensure you have Node.js installed (version 16 or higher recommended)
+1. Ensure you have Node.js installed
 2. Clone this repository or download the script
 3. Navigate to the project directory
 
