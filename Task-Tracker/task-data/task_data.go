@@ -1,19 +1,19 @@
 package task_data
 
-import "time"
-
-type TaskStatus int64 // enum
-
-const (
-	NotStarted TaskStatus = iota
-	InProgress
-	Completed
+import (
+	"errors"
+	"time"
 )
 
-var TaskStatusToString = map[TaskStatus]string{
-	NotStarted: "NotStarted",
-	InProgress: "InProgress",
-	Completed:  "Completed",
+var validStatus = []string{"not-started", "in-progress", "done"}
+
+func IsValidStatus(status string) (bool, error) {
+	for i := range validStatus {
+		if validStatus[i] == status {
+			return true, nil
+		}
+	}
+	return false, errors.New("not a valid status")
 }
 
 type Task struct {

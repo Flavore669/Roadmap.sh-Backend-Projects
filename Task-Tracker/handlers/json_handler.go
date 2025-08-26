@@ -1,9 +1,11 @@
 package json_handler
 
-//TODO: Setup other identifiers for tasks (description). Setup other methods (list, delete)
+//HACK: I should probably seperate this script into 2 scripts, 1 for save functionality. The other serves strictly for command functions that use the former script.
+//TODO: Setup other methods (update)
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
@@ -17,14 +19,14 @@ type TaskJSON struct {
 var totalTasks TaskJSON
 var tasksAsJSON []byte
 
-func contains(otherTask taskConfig.Task) bool {
-	for _, task := range totalTasks.Tasks {
-		if task.ID == otherTask.ID {
-			return true
+func tasksContains(TargetID int) (int, error) {
+	for index, task := range totalTasks.Tasks {
+		if task.ID == TargetID {
+			return index, nil
 		}
 	}
 
-	return false
+	return -1, errors.New("id doesn't exist")
 }
 
 func AddTask(task taskConfig.Task) {
@@ -65,6 +67,47 @@ func ListSavedTasks() {
 	var tasks []taskConfig.Task = LoadData()
 
 	for _, task := range tasks {
-		fmt.Printf("Task: %s\n", task.Description)
+		fmt.Printf("Task ID: %v, Description: %s, Progress: %s\n", task.ID, task.Description, task.TaskStatus)
 	}
+}
+
+func DeleteTask(TargetID int) error {
+	targetIndex, err := tasksContains(TargetID)
+
+	if err != nil {
+		return err
+	}
+
+	var tasksCopy TaskJSON
+	for i := range totalTasks.Tasks {
+		if i == targetIndex {
+			continue
+		}
+		tasksCopy.Tasks = append(tasksCopy.Tasks, totalTasks.Tasks[i])
+	}
+	totalTasks = tasksCopy
+	SaveData()
+
+	return nil
+}
+
+func UpdateTask(targetID int, newStatus string) error {
+	targetIndex, err := tasksContains(targetID)
+	if err != nil {
+		return err
+	}
+
+	_, err1 := taskConfig.IsValidStatus(newStatus)
+	if err1 != nil {
+		return err1
+	}
+
+	for i := range totalTasks.Tasks {
+		if i == targetIndex {
+			totalTasks.Tasks[i].TaskStatus = newStatus
+		}
+	}
+	SaveData()
+
+	return nil
 }
