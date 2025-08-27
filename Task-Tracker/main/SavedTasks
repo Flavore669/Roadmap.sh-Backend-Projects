@@ -1,1 +1,18 @@
-{"Tasks":[{"ID":2,"TaskStatus":"in-progress","CreatedAt":"2025-08-25T00:30:00.1256738-05:00","UpdatedAt":"0001-01-01T00:00:00Z","Description":"Task2"},{"ID":3,"TaskStatus":"NotStarted","CreatedAt":"2025-08-25T16:18:13.089431-05:00","UpdatedAt":"0001-01-01T00:00:00Z","Description":"Task3"}]}
+{
+	"Tasks": [
+		{
+			"ID": 2,
+			"TaskStatus": "in-progress",
+			"CreatedAt": "2025-08-27T18:35:33.5112163-05:00",
+			"UpdatedAt": "2025-08-27T18:39:07.1791964-05:00",
+			"Description": "task"
+		},
+		{
+			"ID": 3,
+			"TaskStatus": "not-started",
+			"CreatedAt": "2025-08-27T18:36:11.6973915-05:00",
+			"UpdatedAt": "0001-01-01T00:00:00Z",
+			"Description": "task3"
+		}
+	]
+}

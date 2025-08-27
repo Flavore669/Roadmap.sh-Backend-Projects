@@ -7,13 +7,13 @@ import (
 
 var validStatus = []string{"not-started", "in-progress", "done"}
 
-func IsValidStatus(status string) (bool, error) {
+func IsValidStatus(status string) error {
 	for i := range validStatus {
 		if validStatus[i] == status {
-			return true, nil
+			return nil
 		}
 	}
-	return false, errors.New("not a valid status")
+	return errors.New("not a valid status")
 }
 
 type Task struct {

@@ -1,13 +1,14 @@
 package json_handler
 
 //HACK: I should probably seperate this script into 2 scripts, 1 for save functionality. The other serves strictly for command functions that use the former script.
-//TODO: Setup other methods (update)
-
+//TODO: Implement listing tasks by status and that should be done! Then Refactor
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 
 	taskConfig "github.com/Flavore669/Roadmap.sh-Backend-Projects/Task-Tracker/task-data"
 )
@@ -18,6 +19,10 @@ type TaskJSON struct {
 
 var totalTasks TaskJSON
 var tasksAsJSON []byte
+
+func return_time(target_time time.Time) string {
+	return target_time.Month().String() + " " + strconv.Itoa(target_time.Day()) + " - " + strconv.Itoa(target_time.Year())
+}
 
 func tasksContains(TargetID int) (int, error) {
 	for index, task := range totalTasks.Tasks {
@@ -36,7 +41,7 @@ func AddTask(task taskConfig.Task) {
 
 func SaveData() {
 	var err error
-	tasksAsJSON, err = json.Marshal(totalTasks)
+	tasksAsJSON, err = json.MarshalIndent(totalTasks, "", "\t")
 	if err != nil {
 		fmt.Printf("Error is %s", err)
 	}
@@ -63,12 +68,30 @@ func LoadData() []taskConfig.Task {
 	return totalTasks.Tasks
 }
 
-func ListSavedTasks() {
+func ListSavedTasks(flags ...string) error {
 	var tasks []taskConfig.Task = LoadData()
-
 	for _, task := range tasks {
-		fmt.Printf("Task ID: %v, Description: %s, Progress: %s\n", task.ID, task.Description, task.TaskStatus)
+		valid := false
+		for f := range flags {
+			err := taskConfig.IsValidStatus(flags[f])
+			if err != nil {
+				return err
+			}
+
+			if flags[f] == task.TaskStatus {
+				valid = true
+			}
+		}
+
+		if !valid {
+			continue
+		}
+
+		fmt.Printf("Task ID: %v, Description: %s, Status: %s, Time Created: %s, Time Updated %s\n",
+			task.ID, task.Description, task.TaskStatus, return_time(task.CreatedAt), return_time(task.UpdatedAt))
 	}
+
+	return nil
 }
 
 func DeleteTask(TargetID int) error {
@@ -97,7 +120,7 @@ func UpdateTask(targetID int, newStatus string) error {
 		return err
 	}
 
-	_, err1 := taskConfig.IsValidStatus(newStatus)
+	err1 := taskConfig.IsValidStatus(newStatus)
 	if err1 != nil {
 		return err1
 	}
@@ -105,6 +128,7 @@ func UpdateTask(targetID int, newStatus string) error {
 	for i := range totalTasks.Tasks {
 		if i == targetIndex {
 			totalTasks.Tasks[i].TaskStatus = newStatus
+			totalTasks.Tasks[i].UpdatedAt = time.Now()
 		}
 	}
 	SaveData()
