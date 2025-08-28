@@ -1,13 +1,12 @@
 package main
 
+//TODO: Rename the taskFile to commandHandler when using new saver
 import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	taskFile "github.com/Flavore669/Roadmap.sh-Backend-Projects/Task-Tracker/handlers"
-	taskConfig "github.com/Flavore669/Roadmap.sh-Backend-Projects/Task-Tracker/task-data"
 )
 
 type TaskState int64
@@ -49,14 +48,10 @@ func main() {
 			fmt.Printf("Error Adding Task: %s", os.Args[2])
 		}
 
-		err1 := addTask(ID, os.Args[3])
-		if err1 != nil {
-			fmt.Printf("Error Adding Task, %s", os.Args[3])
-		}
+		taskFile.AddTask(ID, os.Args[3])
 
 	case "list":
 		additionalArgs := os.Args[2:]
-
 		err2 := taskFile.ListSavedTasks(additionalArgs...)
 		if err2 != nil {
 			fmt.Printf("Error Listing Tasks: %s", err2)
@@ -97,16 +92,4 @@ func main() {
 		fmt.Println("Avaliable Commands: Add Task")
 		fmt.Println("To Use Commands run - go run main.go {your_command}")
 	}
-}
-
-func addTask(taskID int, description string) error {
-	var addedTask taskConfig.Task
-	addedTask.ID = taskID
-	addedTask.CreatedAt = time.Now()
-	addedTask.UpdatedAt = time.Now()
-	addedTask.TaskStatus = "not-started"
-	addedTask.Description = description
-
-	taskFile.AddTask(addedTask)
-	return nil
 }

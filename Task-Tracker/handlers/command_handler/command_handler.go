@@ -1,32 +1,25 @@
 package handlers
 
-//HACK: Check if I could add mor error handling
-//TODO: I should probably seperate this script into 2 scripts, 1 for save functionality. The other serves strictly for command functions that use the former script.
-//TODO: Then Refactor
+//HACK: I should probably seperate this script into 2 scripts, 1 for save functionality. The other serves strictly for command functions that use the former script.
+//TODO: Implement listing tasks by status and that should be done! Then Refactor
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 	"time"
 
+	saveSystem "github.com/Flavore669/Roadmap.sh-Backend-Projects/Task-Tracker/handlers/save_handler"
 	taskConfig "github.com/Flavore669/Roadmap.sh-Backend-Projects/Task-Tracker/task-data"
 )
 
-type TaskJSON struct {
-	Tasks []taskConfig.Task `json:"Tasks"`
-}
-
-var totalTasks TaskJSON
-var tasksAsJSON []byte
+var tasksSaved taskConfig.TaskJSON
 
 func return_time(target_time time.Time) string {
 	return target_time.Month().String() + " " + strconv.Itoa(target_time.Day()) + " - " + strconv.Itoa(target_time.Year())
 }
 
 func tasksContains(TargetID int) (int, error) {
-	for index, task := range totalTasks.Tasks {
+	for index, task := range tasksSaved.Tasks {
 		if task.ID == TargetID {
 			return index, nil
 		}
@@ -43,41 +36,12 @@ func AddTask(taskID int, description string) {
 	addedTask.TaskStatus = "not-started"
 	addedTask.Description = description
 
-	totalTasks.Tasks = append(totalTasks.Tasks, addedTask)
-	SaveData()
-}
-
-func SaveData() {
-	var err error
-	tasksAsJSON, err = json.MarshalIndent(totalTasks, "", "\t")
-	if err != nil {
-		fmt.Printf("Error is %s", err)
-	}
-
-	os.WriteFile("SavedTasks", tasksAsJSON, 0666)
-}
-
-func LoadData() []taskConfig.Task {
-	var err error
-
-	// Read the file
-	tasksAsJSON, err = os.ReadFile("SavedTasks")
-	if err != nil {
-		fmt.Printf("Error reading file: %s\n", err)
-		return nil
-	}
-
-	// Unmarhsal JSON
-	err = json.Unmarshal(tasksAsJSON, &totalTasks)
-	if err != nil {
-		fmt.Printf("Error is %s", err)
-	}
-
-	return totalTasks.Tasks
+	tasksSaved.Tasks = append(tasksSaved.Tasks, addedTask)
+	saveSystem.SaveData(tasksSaved)
 }
 
 func ListSavedTasks(flags ...string) error {
-	var tasks []taskConfig.Task = LoadData()
+	var tasks []taskConfig.Task = saveSystem.LoadData(&tasksSaved)
 	for _, task := range tasks {
 		valid := false
 		if len(flags) > 0 {
@@ -113,15 +77,15 @@ func DeleteTask(TargetID int) error {
 		return err
 	}
 
-	var tasksCopy TaskJSON
-	for i := range totalTasks.Tasks {
+	var tasksCopy taskConfig.TaskJSON
+	for i := range tasksSaved.Tasks {
 		if i == targetIndex {
 			continue
 		}
-		tasksCopy.Tasks = append(tasksCopy.Tasks, totalTasks.Tasks[i])
+		tasksCopy.Tasks = append(tasksCopy.Tasks, tasksSaved.Tasks[i])
 	}
-	totalTasks = tasksCopy
-	SaveData()
+	tasksSaved = tasksCopy
+	saveSystem.SaveData(tasksSaved)
 
 	return nil
 }
@@ -137,13 +101,13 @@ func UpdateTask(targetID int, newStatus string) error {
 		return err1
 	}
 
-	for i := range totalTasks.Tasks {
+	for i := range tasksSaved.Tasks {
 		if i == targetIndex {
-			totalTasks.Tasks[i].TaskStatus = newStatus
-			totalTasks.Tasks[i].UpdatedAt = time.Now()
+			tasksSaved.Tasks[i].TaskStatus = newStatus
+			tasksSaved.Tasks[i].UpdatedAt = time.Now()
 		}
 	}
-	SaveData()
+	saveSystem.SaveData(tasksSaved)
 
 	return nil
 }

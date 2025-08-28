@@ -1,5 +1,6 @@
 package task_data
 
+//TODO: Rename this
 import (
 	"errors"
 	"time"
@@ -22,4 +23,8 @@ type Task struct {
 	CreatedAt   time.Time `json:"CreatedAt"`
 	UpdatedAt   time.Time `json:"UpdatedAt"`
 	Description string    `json:"Description"`
+}
+
+type TaskJSON struct {
+	Tasks []Task `json:"Tasks"`
 }
