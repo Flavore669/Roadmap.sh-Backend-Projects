@@ -70,3 +70,28 @@ Examples
 # Delete task 1
 ./task-tracker delete 1
 ```
+
+### Task Status Options
+
+The application supports three task statuses:
+
+- not-started → Task has been created but not started
+
+- in-progress → Task is currently being worked on
+
+- completed → Task has been finished
+
+### Data Storage
+
+Tasks are automatically saved to a SavedTasks JSON file in the same directory.
+The file format preserves task information including:
+
+- Task ID
+
+- Description
+
+- Status
+
+- Creation timestamp
+
+- Last update timestamp
