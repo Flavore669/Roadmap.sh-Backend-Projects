@@ -8,26 +8,27 @@ import (
 	taskConfig "github.com/Flavore669/Roadmap.sh-Backend-Projects/Task-Tracker/task-data"
 )
 
-var tasksAsJSON []byte
-
-func SaveData(tasksSaved taskConfig.TaskJSON) {
-	var err error
-	tasksAsJSON, err = json.MarshalIndent(tasksSaved, "", "\t")
+// Save inputted tasksSaved to a JSON file
+func SaveData(tasksSaved taskConfig.TaskJSON) error {
+	// Marshal JSON
+	tasksAsJSON, err := json.MarshalIndent(tasksSaved, "", "\t")
 	if err != nil {
 		fmt.Printf("Error is %s", err)
+		return err
 	}
 
+	// Write to File
 	os.WriteFile("SavedTasks", tasksAsJSON, 0666)
+	return nil
 }
 
-func LoadData(tasksSaved *taskConfig.TaskJSON) []taskConfig.Task {
-	var err error
-
+// Load the json file into the reference for tasksSaved
+func LoadData(tasksSaved *taskConfig.TaskJSON) ([]taskConfig.Task, error) {
 	// Read the file
-	tasksAsJSON, err = os.ReadFile("SavedTasks")
+	tasksAsJSON, err := os.ReadFile("SavedTasks")
 	if err != nil {
 		fmt.Printf("Error reading file: %s\n", err)
-		return nil
+		return nil, err
 	}
 
 	// Unmarhsal JSON
@@ -36,5 +37,5 @@ func LoadData(tasksSaved *taskConfig.TaskJSON) []taskConfig.Task {
 		fmt.Printf("Error is %s", err)
 	}
 
-	return tasksSaved.Tasks
+	return tasksSaved.Tasks, nil
 }

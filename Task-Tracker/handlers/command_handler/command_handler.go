@@ -14,6 +14,11 @@ import (
 
 var tasksSaved taskConfig.TaskJSON
 
+func init() {
+	saveSystem.LoadData(&tasksSaved)
+}
+
+// Return desired format for the time
 func return_time(target_time time.Time) string {
 	return target_time.Month().String() + " " + strconv.Itoa(target_time.Day()) + " - " + strconv.Itoa(target_time.Year())
 }
@@ -28,7 +33,7 @@ func tasksContains(TargetID int) (int, error) {
 	return -1, errors.New("id doesn't exist")
 }
 
-func AddTask(taskID int, description string) {
+func AddTask(taskID int, description string) error {
 	var addedTask taskConfig.Task
 	addedTask.ID = taskID
 	addedTask.CreatedAt = time.Now()
@@ -37,15 +42,25 @@ func AddTask(taskID int, description string) {
 	addedTask.Description = description
 
 	tasksSaved.Tasks = append(tasksSaved.Tasks, addedTask)
-	saveSystem.SaveData(tasksSaved)
+
+	err := saveSystem.SaveData(tasksSaved)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ListSavedTasks(flags ...string) error {
-	var tasks []taskConfig.Task = saveSystem.LoadData(&tasksSaved)
+	tasks, err := saveSystem.LoadData(&tasksSaved)
+	if err != nil {
+		return err
+	}
+
 	for _, task := range tasks {
 		valid := false
-		if len(flags) > 0 {
-			for f := range flags {
+		if len(flags) > 0 { // If there are any flags
+			for f := range flags { // Check if this task's status matches any element in flags
 				err := taskConfig.IsValidStatus(flags[f])
 				if err != nil {
 					return err
@@ -77,6 +92,7 @@ func DeleteTask(TargetID int) error {
 		return err
 	}
 
+	// Create a copy of the tasksSaved that doesn't include the deleted task
 	var tasksCopy taskConfig.TaskJSON
 	for i := range tasksSaved.Tasks {
 		if i == targetIndex {
@@ -91,7 +107,7 @@ func DeleteTask(TargetID int) error {
 }
 
 func UpdateTask(targetID int, newStatus string) error {
-	targetIndex, err := tasksContains(targetID)
+	targetIndex, err := tasksContains(targetID) // Find Index
 	if err != nil {
 		return err
 	}
